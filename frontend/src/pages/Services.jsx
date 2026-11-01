@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from '../api'
+import toast from 'react-hot-toast'
+import { useAuth } from '../context/AuthContext'
 import BookingModal from '../components/BookingModal'
 import styles from './Services.module.css'
 
@@ -17,7 +19,12 @@ const FALLBACK = [
 export default function Services() {
   const [services, setServices] = useState(FALLBACK)
   const [selected, setSelected] = useState(null)
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const { user } = useAuth()
   const navigate = useNavigate()
+
+  const [form, setForm] = useState({ name: '', icon: '📦', desc: '', price: '', unit: 'per item', badge: '' })
 
   useEffect(() => {
     axios.get('/api/services').then(r => setServices(r.data)).catch(() => {})
@@ -28,13 +35,47 @@ export default function Services() {
     setSelected(svc)
   }
 
+  const handleAddService = async (event) => {
+    event.preventDefault()
+    setSaving(true)
+    try {
+      const { data } = await axios.post('/api/services', { ...form, price: Number(form.price) })
+      setServices(current => [...current, data])
+      setForm({ name: '', icon: '📦', desc: '', price: '', unit: 'per item', badge: '' })
+      setShowAddForm(false)
+      toast.success('Service added to the catalog')
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Could not add service')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   return (
     <div className={styles.page}>
       <div className={styles.header}>
         <span className={styles.tag}>Our Services</span>
         <h1 className={styles.title}>Everything Delivered to Your Campus</h1>
-        <p className={styles.sub}>6 essential student services. Order anytime, get delivered to your college or doorstep.</p>
+        <p className={styles.sub}>Student services, ready when you need them. Order anytime for delivery to your college or doorstep.</p>
       </div>
+
+      {user?.role === 'admin' && <div className={styles.adminTools}>
+        <button className={styles.addButton} onClick={() => setShowAddForm(open => !open)}>
+          {showAddForm ? 'Cancel' : '+ Add Service'}
+        </button>
+        {showAddForm && <form className={styles.addForm} onSubmit={handleAddService}>
+          <h2>Add a service</h2>
+          <div className={styles.formGrid}>
+            <label>Service name<input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="e.g. Document Printing" /></label>
+            <label>Icon (emoji)<input value={form.icon} onChange={e => setForm({ ...form, icon: e.target.value })} maxLength={8} /></label>
+            <label className={styles.wide}>Description<input required value={form.desc} onChange={e => setForm({ ...form, desc: e.target.value })} placeholder="Describe what students receive" /></label>
+            <label>Price (₹)<input required type="number" min="0" step="0.01" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} /></label>
+            <label>Price unit<input required value={form.unit} onChange={e => setForm({ ...form, unit: e.target.value })} placeholder="per page, per item..." /></label>
+            <label>Badge (optional)<input value={form.badge} onChange={e => setForm({ ...form, badge: e.target.value })} placeholder="New, Popular..." /></label>
+          </div>
+          <button className={styles.addButton} type="submit" disabled={saving}>{saving ? 'Adding…' : 'Save Service'}</button>
+        </form>}
+      </div>}
 
       <div className={styles.grid}>
         {services.map(svc => (
