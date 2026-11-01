@@ -36,6 +36,8 @@
 .availabilityButton:disabled { cursor: wait; opacity: .6; }
 .availableActive { color: #43e97b; border-color: rgba(67,233,123,.4); background: rgba(67,233,123,.12); }
 .unavailableActive { color: #ff9a9a; border-color: rgba(255,101,132,.4); background: rgba(255,101,132,.12); }
+.deleteButton { padding: .3rem .55rem; border: 1px solid rgba(255,101,132,.4); border-radius: 999px; background: rgba(255,101,132,.1); color: #ff9a9a; font: inherit; font-size: .68rem; cursor: pointer; }
+.deleteButton:disabled { cursor: wait; opacity: .6; }
 .unavailableLabel { position: absolute; top: 1rem; right: 1rem; color: #ff9a9a; font-size: .7rem; }
 .unavailableText { color: var(--muted); font-size: .85rem; }
 

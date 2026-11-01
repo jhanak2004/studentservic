@@ -1,5 +1,6 @@
 const express = require('express');
 const Service = require('../models/Service');
+const ServiceCatalog = require('../models/ServiceCatalog');
 const { protect, adminOnly } = require('../middleware/auth');
 
 const router = express.Router();
@@ -16,11 +17,15 @@ const DEFAULT_SERVICES = [
 // GET /api/services
 router.get('/', async (req, res) => {
   try {
-    let services = await Service.find().sort({ createdAt: 1 });
-    if (services.length === 0) {
+    const initialization = await ServiceCatalog.updateOne(
+      { key: 'main' },
+      { $setOnInsert: { initialized: true } },
+      { upsert: true }
+    );
+    if (initialization.upsertedCount === 1 && await Service.countDocuments() === 0) {
       await Service.insertMany(DEFAULT_SERVICES);
-      services = await Service.find().sort({ createdAt: 1 });
     }
+    const services = await Service.find().sort({ createdAt: 1 });
     res.json(services);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -66,6 +71,17 @@ router.patch('/:id/availability', protect, adminOnly, async (req, res) => {
     );
     if (!service) return res.status(404).json({ message: 'Service not found' });
     res.json(service);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// DELETE /api/services/:id (admin only)
+router.delete('/:id', protect, adminOnly, async (req, res) => {
+  try {
+    const service = await Service.findOneAndDelete({ id: req.params.id });
+    if (!service) return res.status(404).json({ message: 'Service not found' });
+    res.json({ message: 'Service permanently deleted', id: service.id });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

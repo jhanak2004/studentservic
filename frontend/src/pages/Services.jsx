@@ -22,6 +22,7 @@ export default function Services() {
   const [showAddForm, setShowAddForm] = useState(false)
   const [saving, setSaving] = useState(false)
   const [availabilitySaving, setAvailabilitySaving] = useState(null)
+  const [deletingService, setDeletingService] = useState(null)
   const { user } = useAuth()
   const navigate = useNavigate()
 
@@ -51,6 +52,22 @@ export default function Services() {
       toast.error(error.response?.data?.message || 'Could not update availability')
     } finally {
       setAvailabilitySaving(null)
+    }
+  }
+
+  const handleDeleteService = async (event, service) => {
+    event.stopPropagation()
+    if (!window.confirm(`Permanently delete “${service.name}”? This removes it from the service catalog.`)) return
+
+    setDeletingService(service.id)
+    try {
+      await axios.delete(`/api/services/${service.id}`)
+      setServices(current => current.filter(item => item.id !== service.id))
+      toast.success(`${service.name} permanently deleted`)
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Could not delete service')
+    } finally {
+      setDeletingService(null)
     }
   }
 
@@ -116,6 +133,14 @@ export default function Services() {
                 disabled={availabilitySaving === svc.id}
                 onClick={event => handleAvailabilityChange(event, svc)}
               >Unavailable</button>
+              <button
+                type="button"
+                className={styles.deleteButton}
+                disabled={deletingService === svc.id}
+                aria-label={`Permanently delete ${svc.name}`}
+                title="Permanently delete service"
+                onClick={event => handleDeleteService(event, svc)}
+              >{deletingService === svc.id ? 'Deleting…' : 'Delete'}</button>
             </div>}
             {svc.isAvailable === false
               ? <span className={styles.unavailableLabel}>Currently unavailable</span>
