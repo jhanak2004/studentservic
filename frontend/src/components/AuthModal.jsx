@@ -7,7 +7,7 @@ const COLLEGES = ['RGPV','IIT Indore','DAVV','SSTC','NRI College','ITM Universit
 
 export default function AuthModal({ mode, onClose, onSwitch }) {
   const { login, register } = useAuth()
-  const [form, setForm] = useState({ name: '', phone: '', password: '', college: '', year: '' })
+  const [form, setForm] = useState({ name: '', phone: '', password: '', college: '', year: '', role: 'student', adminCode: '' })
   const [loading, setLoading] = useState(false)
   const isLogin = mode === 'login'
 
@@ -54,6 +54,22 @@ export default function AuthModal({ mode, onClose, onSwitch }) {
           <label>Password</label>
           <input type="password" value={form.password} onChange={e => set('password', e.target.value)} placeholder="Enter password" />
         </div>
+        {!isLogin && (
+          <div className={styles.group}>
+            <label>Join as</label>
+            <select value={form.role} onChange={e => set('role', e.target.value)}>
+              <option value="student">Student / Member</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+        )}
+        {!isLogin && form.role === 'admin' && (
+          <div className={styles.group}>
+            <label>Admin Invitation Code</label>
+            <input type="password" value={form.adminCode} onChange={e => set('adminCode', e.target.value)} placeholder="Enter the code from your administrator" autoComplete="off" />
+            <small className={styles.fieldHint}>Admin registration requires an invitation code.</small>
+          </div>
+        )}
         {!isLogin && (
           <div className={styles.row}>
             <div className={styles.group}>

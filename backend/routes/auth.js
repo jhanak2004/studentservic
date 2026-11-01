@@ -10,12 +10,22 @@ const generateToken = (id) =>
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
   try {
-    const { name, phone, password, college, year } = req.body;
+    const { name, phone, password, college, year, role, adminCode } = req.body;
     if (!name || !phone || !password)
       return res.status(400).json({ message: 'Name, phone and password are required' });
+    let accountRole = 'student';
+    if (role === 'admin') {
+      if (!process.env.ADMIN_SIGNUP_CODE) {
+        return res.status(403).json({ message: 'Admin sign-up is not enabled. Contact the site administrator.' });
+      }
+      if (typeof adminCode !== 'string' || adminCode !== process.env.ADMIN_SIGNUP_CODE) {
+        return res.status(403).json({ message: 'Invalid admin invitation code' });
+      }
+      accountRole = 'admin';
+    }
     if (await User.findOne({ phone }))
       return res.status(400).json({ message: 'Phone number already registered' });
-    const user = await User.create({ name, phone, password, college, year });
+    const user = await User.create({ name, phone, password, college, year, role: accountRole });
     res.status(201).json({ token: generateToken(user._id), user: { id: user._id, name: user.name, phone: user.phone, college: user.college, role: user.role } });
   } catch (err) {
     res.status(500).json({ message: err.message });
