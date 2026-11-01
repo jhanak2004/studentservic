@@ -14,6 +14,7 @@ app.use(cors({
   origin: [
     'http://localhost:5173',
     'https://studyserve-frontend.onrender.com',
+    'https://studentservic-3.onrender.com',
   ],
   credentials: true,
 }));
