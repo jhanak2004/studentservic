@@ -24,6 +24,7 @@ app.use(express.json());
 app.use('/api/auth',     require('./routes/auth'));
 app.use('/api/orders',   require('./routes/orders'));
 app.use('/api/services', require('./routes/services'));
+app.use('/api/colleges', require('./routes/colleges'));
 app.use('/api/affidavit',require('./routes/affidavit'));
 
 // Health check

@@ -12,8 +12,17 @@
 .sub { color: var(--muted); line-height: 1.7; margin-bottom: 1.5rem; font-size: .95rem; }
 
 .colleges { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.5rem; }
-.pill { background: rgba(255,255,255,.05); border: 1px solid var(--border); padding: .3rem .8rem; border-radius: 50px; font-size: .8rem; color: var(--text); }
+.collegeChip { display: inline-flex; align-items: center; gap: .2rem; }
+.pill { background: rgba(255,255,255,.05); border: 1px solid var(--border); padding: .3rem .8rem; border-radius: 50px; font-size: .8rem; color: var(--text); font-family: var(--font-body); cursor: pointer; }
 .pill.active { background: rgba(108,99,255,.2); border-color: rgba(108,99,255,.4); color: #a09aff; }
+.removeCollege { width: 1.25rem; height: 1.25rem; margin-left: -1.05rem; margin-right: -.05rem; padding: 0; border: 1px solid rgba(255,101,132,.45); border-radius: 50%; background: #21121b; color: #ff9aaf; font-size: .9rem; line-height: 1; cursor: pointer; z-index: 1; }
+.removeCollege:disabled { opacity: .5; cursor: wait; }
+.collegeAdmin { margin: -0.5rem 0 1.5rem; }
+.manageColleges { padding: .35rem .7rem; border: 1px solid rgba(108,99,255,.4); border-radius: 8px; background: rgba(108,99,255,.1); color: #aaa4ff; font: inherit; font-size: .8rem; cursor: pointer; }
+.addCollegeForm { display: flex; gap: .5rem; max-width: 430px; margin-top: .65rem; }
+.addCollegeForm input { flex: 1; min-width: 0; padding: .55rem .7rem; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font: inherit; }
+.addCollegeForm button { padding: .55rem .8rem; border: 0; border-radius: 8px; background: var(--accent); color: #fff; cursor: pointer; }
+.addCollegeForm button:disabled { opacity: .6; cursor: wait; }
 
 .features { display: flex; gap: 1.5rem; flex-wrap: wrap; }
 .features span { font-size: .88rem; color: var(--muted); }
@@ -29,6 +38,7 @@
   font-family: var(--font-body);
 }
 .group input:focus, .group select:focus { border-color: var(--accent); outline: none; }
+.group .customCollege { margin-top: .6rem; }
 
 .row { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
 
