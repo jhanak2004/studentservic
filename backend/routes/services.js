@@ -5,12 +5,12 @@ const { protect, adminOnly } = require('../middleware/auth');
 const router = express.Router();
 
 const DEFAULT_SERVICES = [
-  { id: 'file-pages', name: 'File Pages', icon: '📄', desc: 'Ruled, plain and graph file pages for assignments, practicals & lab records.', price: 2, unit: 'per page', badge: 'Popular' },
-  { id: 'book-spiral', name: 'Book Spiral Binding', icon: '📚', desc: 'Professional spiral binding for assignments, projects, and reports.', price: 30, unit: 'per book', badge: null },
-  { id: 'files-folders', name: 'Files & Folders', icon: '🗂️', desc: 'L-folders, box files, clear folders, and expandable files.', price: 15, unit: 'per piece', badge: null },
-  { id: 'shivani', name: 'Shivani Books', icon: '✍️', desc: 'Shivani publication books, guides, and subject-wise notes for all semesters.', price: 80, unit: 'per book', badge: 'New' },
-  { id: 'photocopy', name: 'Photocopy', icon: '🖨️', desc: 'B&W and colour photocopies of documents, notes, marksheets, and certificates.', price: 1, unit: 'per page', badge: 'Popular' },
-  { id: 'affidavit', name: 'Scholarship Affidavit', icon: '🎓', desc: 'Official affidavits for scholarship applications — all colleges & years.', price: 50, unit: 'per affidavit', badge: null },
+  { id: 'file-pages', name: 'File Pages', icon: '📄', desc: 'Ruled, plain and graph file pages for assignments, practicals & lab records.', price: 2, unit: 'per page', badge: 'Popular', isAvailable: true },
+  { id: 'book-spiral', name: 'Book Spiral Binding', icon: '📚', desc: 'Professional spiral binding for assignments, projects, and reports.', price: 30, unit: 'per book', badge: null, isAvailable: true },
+  { id: 'files-folders', name: 'Files & Folders', icon: '🗂️', desc: 'L-folders, box files, clear folders, and expandable files.', price: 15, unit: 'per piece', badge: null, isAvailable: true },
+  { id: 'shivani', name: 'Shivani Books', icon: '✍️', desc: 'Shivani publication books, guides, and subject-wise notes for all semesters.', price: 80, unit: 'per book', badge: 'New', isAvailable: true },
+  { id: 'photocopy', name: 'Photocopy', icon: '🖨️', desc: 'B&W and colour photocopies of documents, notes, marksheets, and certificates.', price: 1, unit: 'per page', badge: 'Popular', isAvailable: true },
+  { id: 'affidavit', name: 'Scholarship Affidavit', icon: '🎓', desc: 'Official affidavits for scholarship applications — all colleges & years.', price: 50, unit: 'per affidavit', badge: null, isAvailable: true },
 ];
 
 // GET /api/services
@@ -45,8 +45,27 @@ router.post('/', protect, adminOnly, async (req, res) => {
       price: Number(price),
       unit: unit.trim(),
       badge: badge?.trim() || null,
+      isAvailable: true,
     });
     res.status(201).json(service);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// PATCH /api/services/:id/availability (admin only)
+router.patch('/:id/availability', protect, adminOnly, async (req, res) => {
+  try {
+    if (typeof req.body.isAvailable !== 'boolean') {
+      return res.status(400).json({ message: 'isAvailable must be true or false' });
+    }
+    const service = await Service.findOneAndUpdate(
+      { id: req.params.id },
+      { isAvailable: req.body.isAvailable },
+      { new: true, runValidators: true }
+    );
+    if (!service) return res.status(404).json({ message: 'Service not found' });
+    res.json(service);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

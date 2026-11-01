@@ -21,6 +21,7 @@ export default function Services() {
   const [selected, setSelected] = useState(null)
   const [showAddForm, setShowAddForm] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [availabilitySaving, setAvailabilitySaving] = useState(null)
   const { user } = useAuth()
   const navigate = useNavigate()
 
@@ -31,8 +32,26 @@ export default function Services() {
   }, [])
 
   const handleBook = (svc) => {
+    if (svc.isAvailable === false) return
     if (svc.id === 'affidavit') { navigate('/scholarship'); return }
     setSelected(svc)
+  }
+
+  const handleAvailabilityChange = async (event, service) => {
+    event.stopPropagation()
+    const isAvailable = event.currentTarget.dataset.available === 'true'
+    if ((service.isAvailable !== false) === isAvailable) return
+
+    setAvailabilitySaving(service.id)
+    try {
+      const { data } = await axios.patch(`/api/services/${service.id}/availability`, { isAvailable })
+      setServices(current => current.map(item => item.id === data.id ? data : item))
+      toast.success(`${service.name} marked ${isAvailable ? 'available' : 'unavailable'}`)
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Could not update availability')
+    } finally {
+      setAvailabilitySaving(null)
+    }
   }
 
   const handleAddService = async (event) => {
@@ -79,14 +98,36 @@ export default function Services() {
 
       <div className={styles.grid}>
         {services.map(svc => (
-          <div key={svc.id} className={styles.card} onClick={() => handleBook(svc)}>
-            {svc.badge && <span className={styles.badge}>{svc.badge}</span>}
+          <div key={svc.id} className={`${styles.card} ${svc.isAvailable === false ? styles.unavailable : ''}`} onClick={() => handleBook(svc)}>
+            {user?.role === 'admin' && <div className={styles.availabilityControl} onClick={event => event.stopPropagation()}>
+              <button
+                type="button"
+                data-available="true"
+                className={`${styles.availabilityButton} ${svc.isAvailable !== false ? styles.availableActive : ''}`}
+                aria-pressed={svc.isAvailable !== false}
+                disabled={availabilitySaving === svc.id}
+                onClick={event => handleAvailabilityChange(event, svc)}
+              >Available</button>
+              <button
+                type="button"
+                data-available="false"
+                className={`${styles.availabilityButton} ${svc.isAvailable === false ? styles.unavailableActive : ''}`}
+                aria-pressed={svc.isAvailable === false}
+                disabled={availabilitySaving === svc.id}
+                onClick={event => handleAvailabilityChange(event, svc)}
+              >Unavailable</button>
+            </div>}
+            {svc.isAvailable === false
+              ? <span className={styles.unavailableLabel}>Currently unavailable</span>
+              : svc.badge && <span className={styles.badge}>{svc.badge}</span>}
             <div className={styles.icon}>{svc.icon}</div>
             <h3 className={styles.name}>{svc.name}</h3>
             <p className={styles.desc}>{svc.desc}</p>
             <div className={styles.price}>Starting ₹{svc.price} {svc.unit}</div>
             <br />
-            <span className={styles.arrow}>Book Now →</span>
+            {svc.isAvailable === false
+              ? <span className={styles.unavailableText}>Not available for booking right now</span>
+              : <span className={styles.arrow}>Book Now →</span>}
           </div>
         ))}
       </div>

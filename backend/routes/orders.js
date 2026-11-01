@@ -1,14 +1,20 @@
 const express = require('express');
 const router = express.Router();
 const Order = require('../models/Order');
+const Service = require('../models/Service');
 const { protect, adminOnly } = require('../middleware/auth');
 
 // POST /api/orders  — create order (public, no login needed)
 router.post('/', async (req, res) => {
   try {
-    const { customerName, phone, service, serviceIcon, college, quantity, address, notes, price, paymentMethod } = req.body;
+    const { customerName, phone, service, serviceId, serviceIcon, college, quantity, address, notes, price, paymentMethod } = req.body;
     if (!customerName || !phone || !service || !college || !address || !price)
       return res.status(400).json({ message: 'Missing required fields' });
+    const catalogService = await Service.findOne(serviceId ? { id: serviceId } : { name: service });
+    if (!catalogService) return res.status(404).json({ message: 'Service not found' });
+    if (catalogService.isAvailable === false) {
+      return res.status(409).json({ message: 'This service is currently unavailable' });
+    }
     const order = await Order.create({ customerName, phone, service, serviceIcon, college, quantity: quantity || 1, address, notes, price, paymentMethod: paymentMethod || 'cod', user: req.user?._id });
     res.status(201).json(order);
   } catch (err) {

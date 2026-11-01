@@ -28,6 +28,16 @@
 }
 .card:hover { transform: translateY(-6px); border-color: rgba(108,99,255,.4); box-shadow: 0 20px 50px rgba(0,0,0,.4); }
 .card:hover::before { opacity: 1; }
+.unavailable { opacity: .48; filter: saturate(.45); cursor: not-allowed; }
+.unavailable:hover { transform: none; border-color: var(--border); box-shadow: none; }
+
+.availabilityControl { position: absolute; z-index: 2; top: .85rem; left: 1rem; display: flex; gap: .35rem; }
+.availabilityButton { padding: .3rem .55rem; border: 1px solid var(--border); border-radius: 999px; background: rgba(20,20,29,.95); color: var(--muted); font: inherit; font-size: .68rem; cursor: pointer; }
+.availabilityButton:disabled { cursor: wait; opacity: .6; }
+.availableActive { color: #43e97b; border-color: rgba(67,233,123,.4); background: rgba(67,233,123,.12); }
+.unavailableActive { color: #ff9a9a; border-color: rgba(255,101,132,.4); background: rgba(255,101,132,.12); }
+.unavailableLabel { position: absolute; top: 1rem; right: 1rem; color: #ff9a9a; font-size: .7rem; }
+.unavailableText { color: var(--muted); font-size: .85rem; }
 
 .badge { position: absolute; top: 1rem; right: 1rem; background: rgba(67,233,123,.15); color: var(--accent3); border: 1px solid rgba(67,233,123,.25); padding: .2rem .6rem; border-radius: 50px; font-size: .7rem; }
 .icon { font-size: 2.5rem; margin-bottom: 1.25rem; }

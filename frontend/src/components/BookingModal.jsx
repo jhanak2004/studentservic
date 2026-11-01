@@ -21,6 +21,7 @@ export default function BookingModal({ service, onClose }) {
       const res = await axios.post('/api/orders', {
         ...form,
         service: service.name,
+        serviceId: service.id,
         serviceIcon: service.icon,
         price: service.price * form.quantity,
         paymentMethod: 'cod',

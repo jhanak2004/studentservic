@@ -8,6 +8,7 @@ const serviceSchema = new mongoose.Schema({
   price: { type: Number, required: true, min: 0 },
   unit: { type: String, required: true, trim: true },
   badge: { type: String, default: null, trim: true },
+  isAvailable: { type: Boolean, default: true },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Service', serviceSchema);
