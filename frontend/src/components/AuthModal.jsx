@@ -58,7 +58,8 @@ export default function AuthModal({ mode, onClose, onSwitch }) {
           <div className={styles.group}>
             <label>Join as</label>
             <select value={form.role} onChange={e => set('role', e.target.value)}>
-              <option value="student">Student / Member</option>
+              <option value="student">Student</option>
+              <option value="member">Member</option>
               <option value="admin">Admin</option>
             </select>
           </div>

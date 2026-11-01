@@ -13,7 +13,7 @@ router.post('/register', async (req, res) => {
     const { name, phone, password, college, year, role, adminCode } = req.body;
     if (!name || !phone || !password)
       return res.status(400).json({ message: 'Name, phone and password are required' });
-    let accountRole = 'student';
+    let accountRole = ['student', 'member', 'admin'].includes(role) ? role : 'student';
     if (role === 'admin') {
       if (!process.env.ADMIN_SIGNUP_CODE) {
         return res.status(403).json({ message: 'Admin sign-up is not enabled. Contact the site administrator.' });
