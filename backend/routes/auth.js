@@ -55,6 +55,15 @@ router.patch('/me', protect, async (req, res) => {
     for (const field of ['name', 'phone', 'college', 'year', 'address']) {
       if (req.body[field] !== undefined) updates[field] = typeof req.body[field] === 'string' ? req.body[field].trim() : req.body[field];
     }
+    if (req.body.role !== undefined) {
+      if (req.user.role === 'admin') {
+        return res.status(403).json({ message: 'Admin account type cannot be changed in profile settings' });
+      }
+      if (!['student', 'member'].includes(req.body.role)) {
+        return res.status(400).json({ message: 'Choose Student or Member' });
+      }
+      updates.role = req.body.role;
+    }
 
     if (updates.name !== undefined && !updates.name) {
       return res.status(400).json({ message: 'Name cannot be empty' });

@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import toast from 'react-hot-toast'
 import styles from './Settings.module.css'
 
-const EMPTY_PROFILE = { name: '', phone: '', college: '', year: '', address: '' }
+const EMPTY_PROFILE = { name: '', phone: '', college: '', year: '', address: '', role: 'student' }
 
 export default function Settings() {
   const { user, updateProfile } = useAuth()
@@ -17,6 +17,7 @@ export default function Settings() {
       college: user.college || '',
       year: user.year || '',
       address: user.address || '',
+      role: user.role || 'student',
     })
   }, [user])
 
@@ -71,12 +72,21 @@ export default function Settings() {
             </select>
           </label>
         </div>
+        {user.role === 'admin' ? <div className={styles.accountType}>
+          <span>Account type</span><strong>Admin</strong><small>Admin access can’t be changed from profile settings.</small>
+        </div> : <label className={styles.field}>
+          <span>Join as</span>
+          <select value={form.role} onChange={event => updateField('role', event.target.value)}>
+            <option value="student">Student</option>
+            <option value="member">Member</option>
+          </select>
+        </label>}
         <label className={styles.field}>
           <span>Address</span>
           <textarea rows="3" value={form.address} onChange={event => updateField('address', event.target.value)} autoComplete="street-address" placeholder="Hostel, home, or preferred delivery address" />
         </label>
         <div className={styles.footer}>
-          <span className={styles.role}>Account type: {user.role === 'admin' ? 'Admin' : user.role === 'member' ? 'Member' : 'Student'}</span>
+          <span className={styles.role}>Update your account details below.</span>
           <button className={styles.saveButton} type="submit" disabled={saving}>{saving ? 'Saving…' : 'Save changes'}</button>
         </div>
       </form>
