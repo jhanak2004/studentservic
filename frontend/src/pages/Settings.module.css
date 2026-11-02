@@ -1,0 +1,22 @@
+.page { max-width: 760px; margin: 0 auto; padding: 7rem 2rem 5rem; }
+.header { margin-bottom: 1.75rem; }
+.tag { display: inline-block; margin-bottom: .75rem; padding: .3rem .85rem; border: 1px solid rgba(108,99,255,.3); border-radius: 50px; background: rgba(108,99,255,.12); color: var(--accent); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; }
+.title { margin: 0 0 .5rem; color: var(--white); font-family: var(--font-display); font-size: clamp(1.7rem, 4vw, 2.2rem); font-weight: 800; }
+.sub { margin: 0; color: var(--muted); line-height: 1.6; }
+.card { padding: 2rem; border: 1px solid var(--border); border-radius: 16px; background: var(--card); }
+.field { display: flex; flex-direction: column; gap: .45rem; margin-bottom: 1.15rem; color: var(--muted); font-size: .85rem; }
+.field input, .field select, .field textarea { width: 100%; padding: .75rem .9rem; border: 1px solid var(--border); border-radius: 9px; background: var(--bg); color: var(--text); font: inherit; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); outline: none; }
+.field textarea { resize: vertical; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: .5rem; }
+.role { color: var(--muted); font-size: .85rem; text-transform: capitalize; }
+.saveButton { padding: .75rem 1.25rem; border: 0; border-radius: 9px; background: var(--accent); color: white; font: inherit; font-weight: 600; cursor: pointer; }
+.saveButton:disabled { opacity: .6; cursor: wait; }
+
+@media (max-width: 600px) {
+  .page { padding-inline: 1rem; }
+  .card { padding: 1.25rem; }
+  .row { grid-template-columns: 1fr; gap: 0; }
+  .footer { align-items: stretch; flex-direction: column; }
+}

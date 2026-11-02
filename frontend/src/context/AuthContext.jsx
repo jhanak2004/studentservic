@@ -38,6 +38,12 @@ export function AuthProvider({ children }) {
     return res.data.user
   }
 
+  const updateProfile = async (data) => {
+    const res = await axios.patch('/api/auth/me', data)
+    setUser(res.data)
+    return res.data
+  }
+
   const logout = () => {
     localStorage.removeItem('ss_token')
     delete axios.defaults.headers.common['Authorization']
@@ -46,7 +52,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, login, register, updateProfile, logout }}>
       {children}
     </AuthContext.Provider>
   )

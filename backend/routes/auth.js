@@ -48,4 +48,29 @@ router.post('/login', async (req, res) => {
 // GET /api/auth/me
 router.get('/me', protect, (req, res) => res.json(req.user));
 
+// PATCH /api/auth/me — update the signed-in user's profile fields only.
+router.patch('/me', protect, async (req, res) => {
+  try {
+    const updates = {};
+    for (const field of ['name', 'phone', 'college', 'year', 'address']) {
+      if (req.body[field] !== undefined) updates[field] = typeof req.body[field] === 'string' ? req.body[field].trim() : req.body[field];
+    }
+
+    if (updates.name !== undefined && !updates.name) {
+      return res.status(400).json({ message: 'Name cannot be empty' });
+    }
+    if (updates.phone !== undefined && !/^\d{10}$/.test(updates.phone)) {
+      return res.status(400).json({ message: 'Enter a valid 10-digit mobile number' });
+    }
+    if (updates.phone && await User.findOne({ phone: updates.phone, _id: { $ne: req.user._id } })) {
+      return res.status(409).json({ message: 'This phone number is already registered' });
+    }
+
+    const user = await User.findByIdAndUpdate(req.user._id, { $set: updates }, { new: true, runValidators: true }).select('-password');
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 module.exports = router;

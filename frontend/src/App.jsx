@@ -7,6 +7,7 @@ import Services from './pages/Services'
 import TrackOrder from './pages/TrackOrder'
 import MyOrders from './pages/MyOrders'
 import ScholarshipAffidavit from './pages/ScholarshipAffidavit'
+import Settings from './pages/Settings'
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
           <Route path="/track"       element={<TrackOrder />} />
           <Route path="/my-orders"   element={<MyOrders />} />
           <Route path="/scholarship" element={<ScholarshipAffidavit />} />
+          <Route path="/settings"    element={<Settings />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

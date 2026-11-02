@@ -38,6 +38,7 @@ export default function Navbar() {
             </li>
           ))}
           {user && <li><Link to="/my-orders" onClick={() => setMenuOpen(false)}>My Orders</Link></li>}
+          {user && <li><Link to="/settings" className={location.pathname === '/settings' ? styles.active : ''} onClick={() => setMenuOpen(false)}>Settings</Link></li>}
         </ul>
 
         <div className={styles.cta}>
