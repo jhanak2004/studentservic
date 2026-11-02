@@ -1,17 +1,26 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import axios from '../api'
 import { useAuth } from '../context/AuthContext'
 import toast from 'react-hot-toast'
 import styles from './Modal.module.css'
 
-const COLLEGES = ['RGPV','IIT Indore','DAVV','SSTC','NRI College','ITM University','Sage University','Other']
+const FALLBACK_COLLEGES = ['RGPV','IIT Indore','DAVV','SSTC','NRI College','ITM University','Sage University'].map(name => ({ _id: name, name }))
+const OTHER_COLLEGE = '__other_college__'
 
 export default function AuthModal({ mode, onClose, onSwitch }) {
   const { login, register } = useAuth()
   const [form, setForm] = useState({ name: '', phone: '', password: '', college: '', year: '', role: 'student', adminCode: '' })
+  const [colleges, setColleges] = useState(FALLBACK_COLLEGES)
+  const [customCollege, setCustomCollege] = useState('')
   const [loading, setLoading] = useState(false)
   const isLogin = mode === 'login'
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
+
+  useEffect(() => {
+    if (mode !== 'signup') return
+    axios.get('/api/colleges').then(res => setColleges(res.data)).catch(() => {})
+  }, [mode])
 
   const handleSubmit = async () => {
     if (!form.phone || !form.password) return toast.error('Phone and password required')
@@ -22,7 +31,8 @@ export default function AuthModal({ mode, onClose, onSwitch }) {
         await login(form.phone, form.password)
         toast.success('Welcome back! 👋')
       } else {
-        await register(form)
+        const college = form.college === OTHER_COLLEGE ? customCollege.trim() : form.college
+        await register({ ...form, college })
         toast.success('Account created! 🎉')
       }
       onClose()
@@ -75,10 +85,12 @@ export default function AuthModal({ mode, onClose, onSwitch }) {
           <div className={styles.row}>
             <div className={styles.group}>
               <label>College</label>
-              <select value={form.college} onChange={e => set('college', e.target.value)}>
+              <select value={form.college} onChange={e => { set('college', e.target.value); if (e.target.value !== OTHER_COLLEGE) setCustomCollege('') }}>
                 <option value="">Select</option>
-                {COLLEGES.map(c => <option key={c}>{c}</option>)}
+                {colleges.map(college => <option key={college._id} value={college.name}>{college.name}</option>)}
+                <option value={OTHER_COLLEGE}>Other</option>
               </select>
+              {form.college === OTHER_COLLEGE && <input value={customCollege} onChange={e => setCustomCollege(e.target.value)} placeholder="Enter your college name" />}
             </div>
             <div className={styles.group}>
               <label>Year</label>
